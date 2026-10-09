@@ -11,22 +11,25 @@
         <strong>{{ user.username }}</strong>
     </p>
 
-    <p>
-        Статус:
-        {% if user.is_superuser %}
-            <span class="badge text-bg-danger">Администратор</span>
-        {% elif user.is_staff %}
-            <span class="badge text-bg-warning">Сотрудник</span>
-        {% else %}
-            <span class="badge text-bg-success">Студент</span>
-        {% endif %}
+   <p>
+    Статус:
+    {% if user.is_superuser %}
+        <span class="badge text-bg-danger">Администратор</span>
+    {% elif is_methodist %}
+        <span class="badge text-bg-success">Методист</span>
+    {% elif user.is_staff %}
+        <span class="badge text-bg-warning">Сотрудник</span>
+    {% else %}
+        <span class="badge text-bg-secondary">Студент</span>
+    {% endif %}
     </p>
-
     <form method="post" action="/accounts/logout/">
         {% csrf_token %}
         <button class="btn btn-danger" type="submit">
             Выйти
         </button>
     </form>
+
+
 </div>
 {% endblock %}

@@ -1,43 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}Курсы{% endblock %}
+{% block title %}Факультеты{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
-    <h1>Список курсов</h1>
+    <h1>Факультеты</h1>
 
     {% if is_methodist %}
-        <a class="btn btn-primary" href="/courses/add/">
-            Добавить курс
+        <a class="btn btn-primary" href="/departments/add/">
+            Добавить факультет
         </a>
     {% endif %}
 </div>
 
-<table class="table table-striped table-hover">
+<table class="table table-striped">
     <thead class="table-dark">
         <tr>
             <th>ID</th>
             <th>Название</th>
-            <th>Факультет</th>
-            <th>Описание</th>
             {% if is_methodist %}<th>Действия</th>{% endif %}
         </tr>
     </thead>
     <tbody>
-        {% for course in courses %}
+        {% for department in departments %}
         <tr>
-            <td>{{ course.id }}</td>
-            <td>{{ course.title }}</td>
-            <td>{{ course.department.name }}</td>
-            <td>{{ course.description|default:"Нет описания" }}</td>
+            <td>{{ department.id }}</td>
+            <td>{{ department.name }}</td>
             {% if is_methodist %}
             <td>
                 <a class="btn btn-sm btn-warning"
-                   href="/courses/{{ course.id }}/edit/">
+                   href="/departments/{{ department.id }}/edit/">
                     Изменить
                 </a>
                 <a class="btn btn-sm btn-danger"
-                   href="/courses/{{ course.id }}/delete/">
+                   href="/departments/{{ department.id }}/delete/">
                     Удалить
                 </a>
             </td>
@@ -45,7 +41,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5" class="text-center">Курсов пока нет.</td>
+            <td colspan="3" class="text-center">Факультетов пока нет.</td>
         </tr>
         {% endfor %}
     </tbody>
