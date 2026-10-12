@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд - курсы{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none mb-3">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Курсы и запись студентов</h2>
+        </div>
+    </div>
+</div>
+
+{% include "components/filter_form.html" with departments=departments selected_department=selected_department %}
+
+<div class="row row-deck row-cards mb-3">
+    <div class="col-md-6 col-lg-6">
+        {% include "components/metric_card.html" with title="Среднее курсов" value=avg_courses %}
+    </div>
+    <div class="col-md-6 col-lg-6">
+        {% include "components/metric_card.html" with title="Пустых курсов" value=empty_courses.count %}
+    </div>
+</div>
+
+<div class="row row-deck row-cards mb-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Топ-10 курсов по числу студентов</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="topCoursesChart" height="350"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Курсы по факультетам</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="coursesPieChart" height="350"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Курсы без записанных студентов</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Курс</th>
+                    <th>Факультет</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in empty_courses %}
+                <tr>
+                    <td>{{ c.title }}</td>
+                    <td>{{ c.department.name }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" class="text-center text-secondary">Все курсы имеют студентов</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Chart(document.getElementById('topCoursesChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ bar_labels|safe }},
+            datasets: [{
+                label: 'Студенты',
+                data: {{ bar_values|safe }},
+                backgroundColor: '#206bc4'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    new Chart(document.getElementById('coursesPieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ pie_labels|safe }},
+            datasets: [{
+                data: {{ pie_values|safe }},
+                backgroundColor: ['#206bc4', '#4299e1', '#79a6dc', '#a8c5e8', '#d1e0f0']
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+{% endblock %}

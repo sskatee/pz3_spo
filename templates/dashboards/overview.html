@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд - обзор{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none mb-3">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Обзор системы</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row row-deck row-cards mb-3">
+    {% include "components/metric_card.html" with title="Факультеты" value=total_departments %}
+    {% include "components/metric_card.html" with title="Учебные группы" value=total_groups %}
+    {% include "components/metric_card.html" with title="Курсы" value=total_courses %}
+    {% include "components/metric_card.html" with title="Студенты" value=total_students %}
+</div>
+
+<div class="row row-deck row-cards">
+    <div class="col-md-6">
+        {% include "components/chart_card.html" with title="Курсы по факультетам" canvas_id="pieChart" %}
+    </div>
+    <div class="col-md-6">
+        {% include "components/chart_card.html" with title="Студенты по факультетам" canvas_id="barChart" %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ pie_labels|safe }},
+            datasets: [{
+                data: {{ pie_values|safe }},
+                backgroundColor: ['#206bc4', '#4299e1', '#79a6dc', '#a8c5e8', '#d1e0f0']
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ bar_labels|safe }},
+            datasets: [{
+                label: 'Студенты',
+                data: {{ bar_values|safe }},
+                backgroundColor: '#206bc4'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>
+{% endblock %}

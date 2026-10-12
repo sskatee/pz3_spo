@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд - факультеты{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none mb-3">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Аналитика по факультетам</h2>
+        </div>
+    </div>
+</div>
+
+
+<div class="row row-deck row-cards mb-3">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Рейтинг факультетов по числу студентов</h3>
+            </div>
+            <div class="card-body">
+                {% for r in ranking %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ r.name }}</span>
+                        <strong>{{ r.students }}</strong>
+                    </div>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-blue"
+                             style="width: {{ r.percent }}%"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-secondary">Нет данных</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% include "components/chart_card.html" with title="Метрики факультетов" canvas_id="deptBarChart" height=320 %}
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">Сравнить два факультета</h3>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Факультет A</label>
+                <select name="dept_a" class="form-select">
+                    <option value="">—</option>
+                    {% for d in all_departments %}
+                    <option value="{{ d.id }}" {% if dept_a_id == d.id|stringformat:"s" %}selected{% endif %}>
+                        {{ d.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Факультет B</label>
+                <select name="dept_b" class="form-select">
+                    <option value="">—</option>
+                    {% for d in all_departments %}
+                    <option value="{{ d.id }}" {% if dept_b_id == d.id|stringformat:"s" %}selected{% endif %}>
+                        {{ d.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Сравнить</button>
+            </div>
+        </form>
+
+        {% if compare %}
+        <table class="table table-vcenter">
+            <thead>
+                <tr>
+                    <th>Метрика</th>
+                    <th>{{ compare.a.name }}</th>
+                    <th>{{ compare.b.name }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Группы</td>
+                    <td>{{ compare.a.groups }}</td>
+                    <td>{{ compare.b.groups }}</td>
+                </tr>
+                <tr>
+                    <td>Курсы</td>
+                    <td>{{ compare.a.courses }}</td>
+                    <td>{{ compare.b.courses }}</td>
+                </tr>
+                <tr>
+                    <td>Студенты</td>
+                    <td>{{ compare.a.students }}</td>
+                    <td>{{ compare.b.students }}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-secondary">Выберите два факультета для сравнения.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Сводная таблица</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Факультет</th>
+                    <th>Групп</th>
+                    <th>Курсов</th>
+                    <th>Студентов</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in departments %}
+                <tr>
+                    <td>{{ d.name }}</td>
+                    <td>{{ d.groups_count }}</td>
+                    <td>{{ d.courses_count }}</td>
+                    <td>{{ d.students_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Chart(document.getElementById('deptBarChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ bar_labels|safe }},
+            datasets: [
+                {
+                    label: 'Группы',
+                    data: {{ bar_groups|safe }},
+                    backgroundColor: '#4299e1'
+                },
+                {
+                    label: 'Курсы',
+                    data: {{ bar_courses|safe }},
+                    backgroundColor: '#206bc4'
+                },
+                {
+                    label: 'Студенты',
+                    data: {{ bar_students|safe }},
+                    backgroundColor: '#0ca678'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>
+{% endblock %}

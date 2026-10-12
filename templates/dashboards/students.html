@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд — студенты{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none mb-3">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Студенты и группы</h2>
+        </div>
+    </div>
+</div>
+
+{% include "components/filter_form.html" with departments=departments selected_department=selected_department %}
+
+<div class="row row-deck row-cards mb-3">
+    <div class="col-md-12">
+        {% include "components/chart_card.html" with title="Студенты по учебным группам" canvas_id="groupsChart" %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Список студентов</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Студент</th>
+                    <th>Факультет</th>
+                    <th>Группа</th>
+                    <th>Курсов</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.user.username }}</td>
+                    <td>{{ s.department.name|default:"—" }}</td>
+                    <td>{{ s.academic_group.name|default:"—" }}</td>
+                    <td>{{ s.courses_count }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-secondary">Нет данных</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Chart(document.getElementById('groupsChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ bar_labels|safe }},
+            datasets: [{
+                label: 'Студенты',
+                data: {{ bar_values|safe }},
+                backgroundColor: '#206bc4'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>
+{% endblock %}

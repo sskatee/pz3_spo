@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд - активность{% endblock %}
+
+{% block content %}
+<div class="page-header d-print-none mb-3">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Динамика и активность</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row row-deck row-cards mb-3">
+    {% include "components/metric_card.html" with title="Студентов всего" value=total_students %}
+    {% include "components/metric_card.html" with title="Курсов всего" value=total_courses %}
+    {% include "components/metric_card.html" with title="Групп всего" value=total_groups %}
+    {% include "components/metric_card.html" with title="Среднее студентов на группу" value=avg_per_group %}
+</div>
+
+<div class="row row-deck row-cards mb-3">
+    <div class="col-md-7">
+        {% include "components/chart_card.html" with title="Регистрация пользователей по месяцам" canvas_id="lineChart" height=280 %}
+    </div>
+    <div class="col-md-5">
+        {% include "components/chart_card.html" with title="Распределение студентов по числу курсов" canvas_id="distChart" height=280 %}
+    </div>
+</div>
+
+<div class="row row-deck row-cards mb-3">
+    <div class="col-md-12">
+        {% include "components/chart_card.html" with title="Кумулятивный рост курсов" canvas_id="growthChart" height=250 %}
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Загруженность групп</h3>
+    </div>
+    <div class="card-body">
+        {% for h in heatmap %}
+        <div class="mb-2">
+            <div class="d-flex justify-content-between">
+                <span>
+                    <strong>{{ h.name }}</strong>
+                    <span class="text-secondary">— {{ h.department }}</span>
+                </span>
+                <span>{{ h.students }} студ.</span>
+            </div>
+            <div class="progress progress-sm">
+                <div class="progress-bar
+                    {% if h.percent >= 80 %}bg-red
+                    {% elif h.percent >= 50 %}bg-yellow
+                    {% else %}bg-green{% endif %}"
+                     style="width: {{ h.percent }}%"></div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-secondary">Групп пока нет</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: {{ line_labels|safe }},
+            datasets: [{
+                label: 'Новые пользователи',
+                data: {{ line_values|safe }},
+                borderColor: '#206bc4',
+                backgroundColor: 'rgba(32,107,196,0.15)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    new Chart(document.getElementById('distChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ dist_labels|safe }},
+            datasets: [{
+                data: {{ dist_values|safe }},
+                backgroundColor: ['#206bc4', '#4299e1', '#79a6dc', '#a8c5e8', '#d1e0f0', '#f76707']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('growthChart'), {
+        type: 'line',
+        data: {
+            labels: {{ course_labels|safe }},
+            datasets: [{
+                label: 'Курсов накоплено',
+                data: {{ course_values|safe }},
+                borderColor: '#0ca678',
+                backgroundColor: 'rgba(12,166,120,0.15)',
+                fill: true,
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+</script>
+{% endblock %}
