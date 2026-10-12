@@ -1,0 +1,27 @@
+{
+  "name": "pz3-4_spo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "sass static/scss/tabler.scss static/vendor/tabler/css/tabler.min.css --style=compressed --no-source-map"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sskatee/pz4_spo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sskatee/pz4_spo/issues"
+  },
+  "homepage": "https://github.com/sskatee/pz4_spo#readme",
+  "devDependencies": {
+    "sass": "^1.105.1"
+  },
+  "dependencies": {
+    "@tabler/core": "^1.6.1"
+  }
+}

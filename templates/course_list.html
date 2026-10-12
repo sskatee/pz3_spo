@@ -32,15 +32,17 @@
             <td>{{ course.description|default:"Нет описания" }}</td>
             {% if is_methodist %}
             <td>
+            <div class="d-flex gap-1 flex-wrap">
                 <a class="btn btn-sm btn-warning"
-                   href="/courses/{{ course.id }}/edit/">
+                href="/courses/{{ course.id }}/edit/">
                     Изменить
                 </a>
                 <a class="btn btn-sm btn-danger"
-                   href="/courses/{{ course.id }}/delete/">
+                href="/courses/{{ course.id }}/delete/">
                     Удалить
                 </a>
-            </td>
+            </div>
+</td>
             {% endif %}
         </tr>
         {% empty %}
